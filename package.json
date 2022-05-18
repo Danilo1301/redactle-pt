@@ -1,0 +1,25 @@
+{
+  "name": "redactle-ptbr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.ts",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "nodemon server.ts"
+  },
+  "author": "Danilo",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express-session": "^1.17.4",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "request": "^2.88.2",
+    "typescript": "^4.6.4",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^17.0.34"
+  }
+}
