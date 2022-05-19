@@ -13,6 +13,7 @@ const https = require('https');
 const request = require('request');
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
+const sendLog = true;
 let playerId = (0, uuid_1.v4)();
 let redactleIndex = 0;
 let token = "";
@@ -31,13 +32,19 @@ function setupExpress() {
     });
     app.listen(port, () => console.log(`Listening at :${port}`));
 }
+function log(req, message) {
+    let ip = req.headers["x-forwarded-for"];
+    if (typeof ip == 'object')
+        ip = ip[0];
+    if (!ip)
+        return;
+    if (sendLog)
+        Gamelog.log(ip, message);
+}
 function main() {
     setupExpress();
     app.get("/ses", (req, res) => {
-        let ip = req.headers["x-forwarded-for"];
-        if (typeof ip == 'object')
-            ip = ip[0];
-        Gamelog.log(ip || "NO_IP", "started session");
+        log(req, "started session");
         console.log("\n[app] get /ses");
         fetchBody('https://www.redactle.com/ses.php', (data) => {
             const rmetrics = JSON.parse(data);
@@ -64,11 +71,7 @@ function main() {
     });
     app.get("/vic", (req, res) => {
         console.log("\n[app] get /vic");
-        let ip = req.headers["x-forwarded-for"];
-        if (typeof ip == 'object')
-            ip = ip[0];
-        Gamelog.log(ip || "NO_IP", "guessed the article");
-        //getVictoryData((data) => { });
+        log(req, "guessed the article");
         res.sendStatus(404);
         res.end();
     });
