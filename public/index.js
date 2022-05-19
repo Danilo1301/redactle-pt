@@ -34,8 +34,8 @@ var seeAlsoTags = ['See_also', 'Notes', 'References'];
 seeAlsoTags = ['Ver_também', 'Notas', 'Referências'];
 
 var testArticle = undefined;
-testArticle = "World_Trade_Organization"
-testArticle = "Organização_Mundial_do_Comércio";
+//testArticle = "World_Trade_Organization"
+//testArticle = "Organização_Mundial_do_Comércio";
 
 var isLocalHost = (location.hostname === "localhost" || location.hostname === "127.0.0.1");
 var apiUrl = isLocalHost ? "http://localhost:3000" : "https://api-redactle-pt.danilomaioli.repl.co";
@@ -193,8 +193,9 @@ async function fetchData(retry, artStr) {
                 var seeAlso = null;
 
                 var i = 0;
-                while(!seeAlso && i < seeAlsoTags.length-1) {
+                while(!seeAlso && i < seeAlsoTags.length) {
                     seeAlso = document.getElementById(seeAlsoTags[i]);
+                    console.log(`Searching for ${seeAlsoTags[i]}`)
                     i++;
                 }
 

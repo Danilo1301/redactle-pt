@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 //import { v4 as uuidv4 } from 'uuid';
 const gamelog_1 = require("./gamelog");
+const fs = require("fs");
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const https = require('https');
@@ -36,33 +37,42 @@ function log(req, message) {
     if (sendLog)
         gamelog_1.Gamelog.log(ip, message);
 }
+function getArticle(callback) {
+    fetchBody('https://www.redactle.com/ses.php', (data) => {
+        const rmetrics = JSON.parse(data);
+        redactleIndex = rmetrics.redactleIndex;
+        token = rmetrics.token;
+        var article = Buffer.from(rmetrics.article, 'base64').toString('utf-8');
+        //article = 'World_Trade_Organization'
+        console.log("[app] got article: " + article);
+        fetchBody('https://pt.wikipedia.org/w/api.php?action=parse&format=json&page=' + article + '&prop=text&formatversion=2&origin=*', (data) => {
+            var json = JSON.parse(data);
+            var cleanText = json.parse.text.replace(/<img[^>]*>/g, "").replace(/\<small\>/g, '').replace(/\<\/small\>/g, '').replace(/â€“/g, '-').replace(/<audio.*<\/audio>/g, "");
+            fs.writeFileSync("page.html", json.parse.text);
+            var isRedirect = cleanText.includes('redirectMsg');
+            if (isRedirect) {
+                console.log("[app] converting redirect url");
+                var starti = cleanText.indexOf('<a href=\"/wiki/') + 15;
+                var endi = cleanText.indexOf('"', starti);
+                article = decodeURI(cleanText.slice(starti, endi));
+            }
+            console.log("[app] final article:", article);
+            const metrics = {
+                token: token,
+                redactleIndex: rmetrics.redactleIndex,
+                article: Buffer.from(article).toString('base64'),
+                yesterday: rmetrics.yesterday
+            };
+            callback(metrics);
+        });
+    });
+}
 function main() {
     setupExpress();
     app.get("/ses", (req, res) => {
         log(req, "started session");
         console.log("\n[app] get /ses");
-        fetchBody('https://www.redactle.com/ses.php', (data) => {
-            const rmetrics = JSON.parse(data);
-            redactleIndex = rmetrics.redactleIndex;
-            token = rmetrics.token;
-            var article = Buffer.from(rmetrics.article, 'base64').toString('utf-8');
-            console.log("[app] article: " + article);
-            fetchBody('https://pt.wikipedia.org/w/api.php?action=parse&format=json&page=' + article + '&prop=text&formatversion=2&origin=*', (data) => {
-                var json = JSON.parse(data);
-                var cleanText = json.parse.text.replace(/<img[^>]*>/g, "").replace(/\<small\>/g, '').replace(/\<\/small\>/g, '').replace(/â€“/g, '-').replace(/<audio.*<\/audio>/g, "");
-                var starti = cleanText.indexOf('<a href=\"/wiki/') + 15;
-                var endi = cleanText.indexOf('"', starti);
-                var url = decodeURI(cleanText.slice(starti, endi));
-                console.log("[app] url:", url);
-                const metrics = {
-                    token: token,
-                    redactleIndex: rmetrics.redactleIndex,
-                    article: Buffer.from(url).toString('base64'),
-                    yesterday: rmetrics.yesterday
-                };
-                res.json(metrics);
-            });
-        });
+        getArticle(metrics => res.json(metrics));
     });
     app.get("/vic", (req, res) => {
         console.log("\n[app] get /vic");
