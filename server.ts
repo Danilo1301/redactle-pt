@@ -16,7 +16,7 @@ interface SessionMetrics {
 }
 
 const app: express.Application = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 let playerId = uuidv4();
 let redactleIndex = 0;
@@ -38,7 +38,7 @@ function setupExpress() {
         next();
     });
 
-    app.listen(port, "127.0.0.1", () => console.log(`Listening at :${port}`));
+    app.listen(port, () => console.log(`Listening at :${port}`));
 }
 
 function main() {
