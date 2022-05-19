@@ -2,10 +2,11 @@
   "name": "redactle-ptbr",
   "version": "1.0.0",
   "description": "",
-  "main": "server.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "npm run dev",
-    "dev": "nodemon server.ts"
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc --build"
   },
   "author": "Danilo",
   "license": "ISC",
