@@ -49,16 +49,10 @@
         <div class="collapse navbar-collapse ms-5" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link mx-2" href="#" id="infoBtn">Info</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link mx-2" href="#" id="statsBtn">Stats</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link mx-2" href="#" id="settingsBtn">Settings</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link mx-2" href="https://www.patreon.com/jhntrnr" target="_blank">Patreon</a>
+                    <a class="nav-link mx-2" href="https://www.redactle.com" target="_blank">Site original</a>
                 </li>
             </ul>
         </div>
@@ -83,8 +77,19 @@
         </div>
     </div>
 
-    <div class="container p-2">
+    <div id="adapted" class="container p-2" style="display: none;">
         <span>Adaptado por Danilo Maioli (Reportar problemas no <a class="discordBtn" href="#">Discord</a>)</span>
+    </div>
+
+    <div id="loading" class="container p-2">
+        <div class="d-flex align-items-center">
+            <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+            <strong id="loading-message" class="m-2">Carregando...</strong>
+          </div>
+    </div>
+    
+
+    
     </div>
 
     <div class="container container-lg mt-3" id="winText"></div>

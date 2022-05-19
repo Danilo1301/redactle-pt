@@ -54,6 +54,14 @@ function median(numbers) {
     return sorted[middle];
 }
 
+function setLoadingText(text) {
+    document.getElementById("loading-message").textContent = text;
+}
+
+function setLoadingVisible(visible) {
+    document.getElementById("loading").style.display = visible ? "block" : "none";
+}
+
 const average = (array) => array.reduce((a, b) => a + b) / array.length;
 
 function LoadSave(){
@@ -68,14 +76,17 @@ function LoadSave(){
     localStorage.setItem("redactleSavet",JSON.stringify(save));
     playerID = save.id.playerID;
   
-    console.log("save data");
+    console.log("connecting to server...")
   
-  
+    setLoadingText('Conectando-se ao servidor...');
+
     $.ajax({
         type: "GET",
         url: "/ses",
         dataType:'text',
         success: function(data){
+
+            //document.getElementById("loading").style.display = 'none';
 
             console.log(data);
 
@@ -131,6 +142,8 @@ var retryAttempts = 0;
 
 async function fetchData(retry, artStr) {
     
+    setLoadingText('Procurando texto...');
+
     if(retry){
         retryAttempts++;
         var article = artStr;
@@ -159,7 +172,9 @@ async function fetchData(retry, artStr) {
         })
         .then(receivedJson => {
 
-            console.log(receivedJson);
+            setLoadingVisible(false);
+
+            document.getElementById("adapted").style.display = "block";
 
             conting = true;
             var cleanText = receivedJson.parse.text.replace(/<img[^>]*>/g,"").replace(/\<small\>/g,'').replace(/\<\/small\>/g,'').replace(/â€“/g,'-').replace(/<audio.*<\/audio>/g,"");
@@ -179,8 +194,6 @@ async function fetchData(retry, artStr) {
                     seeAlso = document.getElementById(seeAlsoTags[i]);
                     i++;
                 }
-
-                console.log(seeAlso)
 
                 var e = document.getElementsByClassName('mw-parser-output');
                 alsoIndex = Array.prototype.indexOf.call(seeAlso.parentNode.children, seeAlso);
