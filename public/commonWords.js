@@ -1,0 +1,1 @@
+const commonWords = ["um", "uma", "sobre", "e", "como", "porque", "antes", "apesar", "entretanto", "entre", "ainda", "além", "mas", "por", "considerado", "consideram", "acima", "abaixo", "durante", "exceto", "seguindo", "se", "em", "dentro", "fora", "exemplo", "foi", "com", "sem", "maior", "menor", "passado"]
