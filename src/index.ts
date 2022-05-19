@@ -16,7 +16,7 @@ interface SessionMetrics {
 }
 
 const app: express.Application = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
 let playerId = uuidv4();
 let redactleIndex = 0;

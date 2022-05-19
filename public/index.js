@@ -565,7 +565,10 @@ function SaveProgress(){
 
 var discordModal = new bootstrap.Modal(document.getElementById('discordModal'));
 
+const prevFn = window.onload;
 window.onload = function(){
+    if(prevFn) prevFn();
+
     $(".discordBtn").click(function(){
         discordModal.show();
         document.querySelector("body").style.overflow = "hidden";
