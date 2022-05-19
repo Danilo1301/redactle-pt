@@ -20,7 +20,7 @@ function setupExpress() {
     app.use((0, express_session_1.default)({ secret: 'random cat', resave: true, saveUninitialized: true, cookie: { secure: false } }));
     app.use(cookieParser());
     app.use(bodyParser.json());
-    app.use(express_1.default.static(path_1.default.join(__dirname, "public")));
+    app.use(express_1.default.static(path_1.default.join(__dirname, "..", "public")));
     app.use((req, res, next) => {
         if (!req.session['token']) {
             req.session['token'] = (0, uuid_1.v4)();
