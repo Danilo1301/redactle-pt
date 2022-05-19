@@ -452,7 +452,7 @@ function WinRound(populate){
             vicData = JSON.parse(data);
         },
         error: function(){
-            document.getElementById("winText").innerHTML = `<h3>Congratulations, you solved Redactle #${redactleIndex+1}!</h3><ul><li>The answer was: ${ansStr}</li><li>You solved it in ${gameScores[redactleIndex]} guesses</li><li>Your accuracy was ${currentAccuracy}%</li><li>You have solved ${streakCount} consecutive Redactles</li></ul><p><a href="javascript:ShareResults();">Share your results</a></p>`;
+            document.getElementById("winText").innerHTML = `<h3>Congratulations, you solved Redactle #${redactleIndex+1}!</h3><ul><li>The answer was: ${ansStr}</li><li>You solved it in ${gameScores[redactleIndex]} guesses</li><li>Your accuracy was ${currentAccuracy}%</li><li>You have solved ${streakCount} consecutive Redactles</li></ul><p><a href="javascript:ShareResults();">Share your results</a></p><p><a href="javascript:ResetResults();">Reset</a></p>`;
             document.getElementById("winText").style.display = 'block';
         }
     }).then( function(){
@@ -487,6 +487,11 @@ function ShareResults(){
     else {
         alert("Something went wrong trying to copy results to clipboard.");
     }
+}
+
+function ResetResults() {
+    localStorage.clear()
+    location.reload();
 }
 
 function RevealPage(){
