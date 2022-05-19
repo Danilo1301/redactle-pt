@@ -1,44 +1,32 @@
 import express from 'express';
 import path from 'path';
-import session from 'express-session';
-import { v4 as uuidv4 } from 'uuid';
+//import { v4 as uuidv4 } from 'uuid';
+import { Gamelog } from './gamelog';
+import { SessionMetrics } from './sessionMetrics';
 
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const https = require('https');
-const request = require('request');
-
-interface SessionMetrics {
-    token: string
-    redactleIndex: number
-    article: string
-    yesterday: string
-}
 
 const app: express.Application = express();
 const port = process.env.PORT || 3000;
-
 const sendLog = true;
 
-let playerId = uuidv4();
+//let playerId = uuidv4();
 let redactleIndex = 0;
 let token = "";
 
 function setupExpress() {
-    app.use(session({ secret: 'random cat', resave: true, saveUninitialized: true, cookie: { secure: false }}));
+    app.all('/*', function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        next();
+    });
+
     app.use(cookieParser());
     app.use(bodyParser.json());
 
     app.use(express.static(path.join(__dirname, "..", "public")));
-
-    app.use((req, res, next) => {
-        if(!req.session['token']) {
-            req.session['token'] = uuidv4();
-            req.session.save();
-            //console.log("\n[app] new user, token defined");
-        }
-        next();
-    });
 
     app.listen(port, () => console.log(`Listening at :${port}`));
 }
@@ -56,9 +44,7 @@ function main() {
     setupExpress();
 
     app.get("/ses", (req, res) => {
-
         log(req, "started session");
-        
         console.log("\n[app] get /ses");
 
         fetchBody('https://www.redactle.com/ses.php', (data) => {
@@ -82,7 +68,7 @@ function main() {
                 console.log("[app] url:", url);
 
                 const metrics: SessionMetrics = {
-                    token: req.session['token'],
+                    token: token,
                     redactleIndex: rmetrics.redactleIndex,
                     article: Buffer.from(url).toString('base64'),
                     yesterday: rmetrics.yesterday
@@ -90,16 +76,11 @@ function main() {
         
                 res.json(metrics);
             });
-         })
-
-
-
-        
+         });
     })
 
     app.get("/vic", (req, res) => {
         console.log("\n[app] get /vic");
-
         log(req, "guessed the article");
         
         res.sendStatus(404);
@@ -110,19 +91,14 @@ function main() {
 function fetchBody(url: string, callback: (data: string) => void) {
     https.get(url, (resp) => {
         let data = '';
-
-        resp.on('data', (chunk) => {
-            data += chunk;
-        });
-
-        resp.on('end', () => {
-            callback(data);
-        });
+        resp.on('data', (chunk) => { data += chunk; });
+        resp.on('end', () => { callback(data);  });
     }).on("error", (err) => {
         console.log("Error: " + err.message);
     });
 }
 
+/*
 function getVictoryData(callback: (data: string) => void) {
     console.log(token)
 
@@ -149,47 +125,6 @@ function getVictoryData(callback: (data: string) => void) {
         }
     );
 }
-
-
-class Gamelog {
-    public static URL = "https://dmdassc.glitch.me/gamelog/log";
-    public static LOCAL_URL = "http://127.0.0.1:3000/gamelog/log";
-    public static SERVICE_NAME = "redactle-pt";
-    public static forceSendToMainServer = false;
-
-    public static log(address: string, message: string) {
-        let url = this.URL
-        let isLocal = address.includes("127.0.0.1");
-
-        if(isLocal && !this.forceSendToMainServer)
-            url = this.LOCAL_URL;
-
-        const data = {
-            service: this.SERVICE_NAME,
-            address: address,
-            message: message,
-            sendPing: !isLocal,
-            isLocal: isLocal
-        }
-
-        console.log("[gamelog] post", url, data)
-
-        request.post(
-            url,
-            { headers: {'user-agent': `service-${this.SERVICE_NAME}`}, json: data },
-            function (error, response, body) {
-
-                if(error) {
-                    console.log("[gamelog] post error");
-                    return
-                }
-
-                if (response.statusCode == 200) {
-                    console.log("[gamelog] post ok");
-                }
-            }
-        );
-    }
-}
+*/
 
 main();

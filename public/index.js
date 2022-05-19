@@ -37,6 +37,9 @@ var testArticle = undefined;
 testArticle = "World_Trade_Organization"
 testArticle = "Organização_Mundial_do_Comércio";
 
+var isLocalHost = (location.hostname === "localhost" || location.hostname === "127.0.0.1");
+var apiUrl = isLocalHost ? "http://localhost:3000" : "https://api-redactle-pt.danilomaioli.repl.co";
+
 function uuidv4(){
     return ([1e7]+1e3+4e3+8e3+1e11).replace(/[018]/g, c =>
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
@@ -82,7 +85,7 @@ function LoadSave(){
 
     $.ajax({
         type: "GET",
-        url: "/ses",
+        url: apiUrl + "/ses",
         dataType:'text',
         success: function(data){
 
@@ -458,7 +461,7 @@ function WinRound(populate){
     var vicData;
     $.ajax({
         type: "get",
-        url: "/vic",
+        url: apiUrl + "/vic",
         dataType:'text',
         data:{},
         success: function(data){
