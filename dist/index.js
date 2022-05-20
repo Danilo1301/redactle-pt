@@ -47,7 +47,7 @@ function getArticle(callback) {
         console.log("[app] got article: " + article);
         fetchBody('https://en.wikipedia.org/wiki/' + article, (data) => {
             //var cleanText: string = data.replace(/<img[^>]*>/g,"").replace(/\<small\>/g,'').replace(/\<\/small\>/g,'').replace(/â€“/g,'-').replace(/<audio.*<\/audio>/g,"");
-            fs.writeFileSync("page.html", data, "utf-8");
+            fs.writeFileSync("public/page.html", data, "utf-8");
             console.log("[app] converting redirect url");
             var ptLink = `badge"><a href="https://pt.wikipedia.org/wiki/`;
             var startI = data.indexOf(ptLink) + ptLink.length;
