@@ -87,6 +87,9 @@ function LoadSave(){
         type: "GET",
         url: apiUrl + "/ses",
         dataType:'text',
+        error: function(error) {
+            alert("Internal error");
+        },
         success: function(data){
 
             //document.getElementById("loading").style.display = 'none';
@@ -147,26 +150,24 @@ async function fetchData(retry, artStr) {
     
     setLoadingText('Procurando texto...');
 
-    if(retry){
-        retryAttempts++;
-        var article = artStr;
-
-        if(retryAttempts >= 0) {
-            console.error("Too many fetch attempts");
-            alert("Something went wrong while loading the page. Try refreshing.");
-
-            return;
+    try {
+        if(retry){
+            retryAttempts++;
+            var article = artStr;
+    
+            if(retryAttempts >= 0) {
+                alert("Something went wrong while loading the page. Try refreshing.");
+                throw ("Too many fetch attempts");
+            }
+            
+        } else{
+            retryAttempts = 0;
+            var article = atob(artStr);
         }
-        
-    } else{
-        retryAttempts = 0;
-        var article = atob(artStr);
-    }
+    
+        if(testArticle) article = testArticle;
 
-    if(testArticle) article = testArticle;
-
-
-    return await fetch('https://' + lang + '.wikipedia.org/w/api.php?action=parse&format=json&page=' + article + '&prop=text&formatversion=2&origin=*')
+        await fetch('https://' + lang + '.wikipedia.org/w/api.php?action=parse&format=json&page=' + article + '&prop=text&formatversion=2&origin=*')
        .then(resp => {
             if (!resp.ok) {
                 throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`;
@@ -306,9 +307,26 @@ async function fetchData(retry, artStr) {
             }
         })
         .catch(err => {
-            console.error("Error in fetch", err);
             alert("Something went wrong while loading the page. Try refreshing.");
+            throw "Error in fetch" + err;
         });
+    } catch (error) {
+        console.error(error);
+        console.log("reporting error");
+
+        $.ajax({
+            type: "POST",
+            url: "/err",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                'message': error
+            }),success: function(data){
+            }
+        })
+    }
+
+
+
 }
 LoadSave();
 

@@ -18,13 +18,13 @@ const sendLog = true;
 let redactleIndex = 0;
 let token = "";
 function setupExpress() {
+    app.use(cookieParser());
+    app.use(express_1.default.json());
     app.all('/*', function (req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
         next();
     });
-    app.use(cookieParser());
-    app.use(bodyParser.json());
     app.use(express_1.default.static(path_1.default.join(__dirname, "..", "public")));
     app.listen(port, () => console.log(`Listening at :${port}`));
 }
@@ -38,31 +38,47 @@ function log(req, message) {
         gamelog_1.Gamelog.log(ip, message);
 }
 function getArticle(callback) {
+    let metrics = {
+        token: '',
+        redactleIndex: 0,
+        article: '',
+        yesterday: ''
+    };
     fetchBody('https://www.redactle.com/ses.php', (data) => {
-        const rmetrics = JSON.parse(data);
-        redactleIndex = rmetrics.redactleIndex;
-        token = rmetrics.token;
-        var article = Buffer.from(rmetrics.article, 'base64').toString('utf-8');
-        //article = 'World_Trade_Organization'
-        console.log("[app] got article: " + article);
-        fetchBody('https://en.wikipedia.org/wiki/' + article, (data) => {
-            //var cleanText: string = data.replace(/<img[^>]*>/g,"").replace(/\<small\>/g,'').replace(/\<\/small\>/g,'').replace(/â€“/g,'-').replace(/<audio.*<\/audio>/g,"");
-            fs.writeFileSync("public/page.html", data, "utf-8");
-            console.log("[app] converting redirect url");
-            var ptLink = `badge"><a href="https://pt.wikipedia.org/wiki/`;
-            var startI = data.indexOf(ptLink) + ptLink.length;
-            var endI = data.indexOf('"', startI);
-            var sl = data.slice(startI, endI);
-            article = decodeURI(sl);
-            console.log("[app] final article:", article);
-            const metrics = {
-                token: token,
-                redactleIndex: rmetrics.redactleIndex,
-                article: Buffer.from(article).toString('base64'),
-                yesterday: rmetrics.yesterday
-            };
-            callback(metrics);
-        });
+        try {
+            const rmetrics = JSON.parse(data);
+            redactleIndex = rmetrics.redactleIndex;
+            token = rmetrics.token;
+            var article = Buffer.from(rmetrics.article, 'base64').toString('utf-8');
+            //article = 'World_Trade_Organization'
+            console.log("[app] got article: " + article);
+            fetchBody('https://en.wikipedia.org/wiki/' + article, (data) => {
+                try {
+                    //var cleanText: string = data.replace(/<img[^>]*>/g,"").replace(/\<small\>/g,'').replace(/\<\/small\>/g,'').replace(/â€“/g,'-').replace(/<audio.*<\/audio>/g,"");
+                    fs.writeFileSync("public/page.html", data, "utf-8");
+                    console.log("[app] converting redirect url");
+                    var ptLink = `badge"><a href="https://pt.wikipedia.org/wiki/`;
+                    var startI = data.indexOf(ptLink) + ptLink.length;
+                    var endI = data.indexOf('"', startI);
+                    var sl = data.slice(startI, endI);
+                    article = decodeURI(sl);
+                    console.log("[app] final article:", article);
+                    metrics = {
+                        token: token,
+                        redactleIndex: rmetrics.redactleIndex,
+                        article: Buffer.from(article).toString('base64'),
+                        yesterday: rmetrics.yesterday
+                    };
+                    callback(metrics, undefined);
+                }
+                catch (error) {
+                    callback(metrics, error);
+                }
+            });
+        }
+        catch (error) {
+            callback(metrics, error);
+        }
     });
 }
 function main() {
@@ -70,7 +86,14 @@ function main() {
     app.get("/ses", (req, res) => {
         log(req, "started session");
         console.log("\n[app] get /ses");
-        getArticle(metrics => res.json(metrics));
+        getArticle((metrics, err) => {
+            if (err) {
+                reportError(err);
+                res.status(404).end(err.toString());
+                return;
+            }
+            res.json(metrics);
+        });
     });
     app.get("/vic", (req, res) => {
         console.log("\n[app] get /vic");
@@ -78,6 +101,14 @@ function main() {
         res.sendStatus(404);
         res.end();
     });
+    app.post("/err", (req, res) => {
+        var data = req.body;
+        reportError(data.message);
+    });
+}
+function reportError(error) {
+    console.log(`[app] error: ${error}`);
+    gamelog_1.Gamelog.log("-", `ERROR: ${error}`);
 }
 function fetchBody(url, callback) {
     console.log(`[fetch] ${url}`);
