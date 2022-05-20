@@ -51,26 +51,27 @@ function getArticle(callback: (metrics: SessionMetrics) => void) {
 
         var article = Buffer.from(rmetrics.article, 'base64').toString('utf-8');
 
+    
         //article = 'World_Trade_Organization'
 
         console.log("[app] got article: " + article);
 
-        fetchBody('https://pt.wikipedia.org/w/api.php?action=parse&format=json&page=' + article + '&prop=text&formatversion=2&origin=*', (data) => {
-            var json = JSON.parse(data);
-            var cleanText: string = json.parse.text.replace(/<img[^>]*>/g,"").replace(/\<small\>/g,'').replace(/\<\/small\>/g,'').replace(/â€“/g,'-').replace(/<audio.*<\/audio>/g,"");
 
-            //fs.writeFileSync("page.html", json.parse.text);
 
-            var isRedirect = cleanText.includes('redirectMsg');
+        fetchBody('https://en.wikipedia.org/wiki/' + article, (data) => {
+            //var cleanText: string = data.replace(/<img[^>]*>/g,"").replace(/\<small\>/g,'').replace(/\<\/small\>/g,'').replace(/â€“/g,'-').replace(/<audio.*<\/audio>/g,"");
 
-            if(isRedirect) {
-                console.log("[app] converting redirect url")
+            fs.writeFileSync("page.html", data, "utf-8");
 
-                var starti = cleanText.indexOf('<a href=\"/wiki/') + 15;
-                var endi = cleanText.indexOf('"', starti);
+            console.log("[app] converting redirect url")
 
-                article = decodeURI(cleanText.slice(starti, endi));
-            }
+            var ptLink = `badge"><a href="https://pt.wikipedia.org/wiki/`;
+            var startI = data.indexOf(ptLink) + ptLink.length;
+            var endI = data.indexOf('"', startI);
+            var sl = data.slice(startI, endI);
+
+            article = decodeURI(sl);
+            
 
             console.log("[app] final article:", article);
 
@@ -106,8 +107,14 @@ function main() {
 }
 
 function fetchBody(url: string, callback: (data: string) => void) {
+
+    console.log(`[fetch] ${url}`);
+
     https.get(url, (resp) => {
         let data = '';
+
+        console.log(`[fetch] body: `, data);
+
         resp.on('data', (chunk) => { data += chunk; });
         resp.on('end', () => { callback(data);  });
     }).on("error", (err) => {
