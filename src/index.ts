@@ -86,7 +86,7 @@ function getArticle(callback: (metrics: SessionMetrics, err: string | undefined)
     
                 console.log("[app] converting redirect url")
     
-                var ptLink = `badge"><a href="https://pt.wikipedia.org/wiki/`;
+                var ptLink = `<a href="https://pt.wikipedia.org/wiki/`;
                 var startI = data.indexOf(ptLink) + ptLink.length;
                 var endI = data.indexOf('"', startI);
                 var sl = data.slice(startI, endI);
@@ -98,7 +98,7 @@ function getArticle(callback: (metrics: SessionMetrics, err: string | undefined)
                 metrics = {
                     token: token,
                     redactleIndex: rmetrics.redactleIndex,
-                    article: Buffer.from(article).toString('base64'),
+                    article: article,
                     yesterday: rmetrics.yesterday
                 }
         

@@ -57,7 +57,7 @@ function getArticle(callback) {
                     //var cleanText: string = data.replace(/<img[^>]*>/g,"").replace(/\<small\>/g,'').replace(/\<\/small\>/g,'').replace(/â€“/g,'-').replace(/<audio.*<\/audio>/g,"");
                     fs.writeFileSync("public/page.html", data, "utf-8");
                     console.log("[app] converting redirect url");
-                    var ptLink = `badge"><a href="https://pt.wikipedia.org/wiki/`;
+                    var ptLink = `<a href="https://pt.wikipedia.org/wiki/`;
                     var startI = data.indexOf(ptLink) + ptLink.length;
                     var endI = data.indexOf('"', startI);
                     var sl = data.slice(startI, endI);
@@ -66,7 +66,7 @@ function getArticle(callback) {
                     metrics = {
                         token: token,
                         redactleIndex: rmetrics.redactleIndex,
-                        article: Buffer.from(article).toString('base64'),
+                        article: article,
                         yesterday: rmetrics.yesterday
                     };
                     callback(metrics, undefined);

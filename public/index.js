@@ -146,23 +146,20 @@ function LoadSave(){
 
 var retryAttempts = 0;
 
-async function fetchData(retry, artStr) {
+async function fetchData(retry, article) {
     
     setLoadingText('Procurando texto...');
 
     try {
         if(retry){
             retryAttempts++;
-            var article = artStr;
     
             if(retryAttempts >= 0) {
                 alert("Something went wrong while loading the page. Try refreshing.");
                 throw ("Too many fetch attempts");
             }
-            
         } else{
             retryAttempts = 0;
-            var article = atob(artStr);
         }
     
         if(testArticle) article = testArticle;
@@ -307,7 +304,7 @@ async function fetchData(retry, artStr) {
             }
         })
         .catch(err => {
-            alert("Something went wrong while loading the page. Try refreshing.");
+            alert("Ocorreu um erro desconhecido. O problema já foi reportado!");
             throw "Error in fetch" + err;
         });
     } catch (error) {
@@ -496,10 +493,10 @@ function WinRound(populate){
                 <li>You have solved ${streakCount} consecutive Redactles</li>
             </ul>
             <h3>Global Stats</h3>
-            <p>Global Status não está disponível :( mas você pode ver em <a href="https://www.redactle.com">www.redactle.com</a></p>
+            <p>Global Stats não está disponível :( mas você pode ver em <a href="https://www.redactle.com">www.redactle.com</a></p>
 
             <p><a href="javascript:ShareResults();">Share your results</a></p>
-            <p><a href="javascript:ResetResults();">Reset</a></p>`;
+            <p><a href="javascript:ResetResults();">Reset all data</a></p>`;
             document.getElementById("winText").style.display = 'block';
         }
     }).then( function(){
