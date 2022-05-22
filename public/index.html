@@ -24,20 +24,6 @@
     <meta name="twitter:title" content="Redactle - A daily web browser puzzle game"/>
     <meta name="twitter:description" content="Try to find the title of a random Wikipedia article by guessing words to reveal them on the page. New puzzle daily!"/>
     <meta name="twitter:image" content="https://www.redactle.com/twitterCard.png"/>
-    <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
-    <script>
-    var googletag = googletag || {};
-    googletag.cmd = googletag.cmd || [];
-    </script>
-
-    <script>
-    googletag.cmd.push(function() {
-        googletag.defineSlot('/25379366/22734263370', [336, 280], 'www.redactle.com_23696_336x280_6271541fd3fe7').addService(googletag.pubads());
-        googletag.pubads().enableSingleRequest();
-        googletag.pubads().collapseEmptyDivs();
-        googletag.enableServices();
-    });
-    </script>
     <title>Redactle - A daily puzzle game</title>
 </head>
 <body>
@@ -82,6 +68,13 @@
 
     <div id="adapted" class="container p-2" style="display: none;">
         <small style="font-size: 10px;">Adaptado por Danilo Maioli (Reportar problemas no <a class="discordBtn" href="#">Discord</a>)</small>
+    </div>
+
+    <div id="error" class="container p-2" style="display: none;">
+        <h1>Erro</h1>
+        <h4>Aparentemente o Redactle de hoje não tem uma página correspondente em português :(</h4>
+        <div style="font-size: 10px;">Ver página em português: <a id="error-link" href="https://pt.wikipedia.org/wiki/Fam%C3%ADlia">Wikipedia</a></div>
+        <div style="font-size: 10px;">Erro: <b id="error-msg"></b></div>
     </div>
 
     <div id="loading" class="container p-2">

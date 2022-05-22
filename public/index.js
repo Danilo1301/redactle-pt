@@ -304,7 +304,7 @@ async function fetchData(retry, article) {
             }
         })
         .catch(err => {
-            alert("Ocorreu um erro desconhecido. O problema já foi reportado!");
+            //alert("Ocorreu um erro desconhecido. O problema já foi reportado!");
             throw "Error in fetch" + err;
         });
     } catch (error) {
@@ -313,19 +313,28 @@ async function fetchData(retry, article) {
 
         $.ajax({
             type: "POST",
-            url: "/err",
+            url: apiUrl + "/err",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
                 'message': error
             }),success: function(data){
             }
         })
+
+        showErrorMsg(error);
+
     }
 
 
 
 }
 LoadSave();
+
+function showErrorMsg(err) {
+    document.getElementById("error").style.display = "block";
+    document.getElementById("error-link").href = `https://pt.wikipedia.org/wiki/${startMetrics.article}`
+    document.getElementById("error-msg").textContent = err
+}
 
 function PerformGuess(guessedWord, populate){
     clickThruIndex = 0;
