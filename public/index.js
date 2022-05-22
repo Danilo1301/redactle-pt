@@ -322,11 +322,7 @@ async function fetchData(retry, article) {
         })
 
         showErrorMsg(error);
-
     }
-
-
-
 }
 LoadSave();
 

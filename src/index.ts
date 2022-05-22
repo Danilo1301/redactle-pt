@@ -28,6 +28,8 @@ const sendLog = true;
 let redactleIndex = 0;
 let token = "";
 
+const manualFixes = [["Alligator", "Jacaré"]];
+
 function setupExpress() {    
     app.all('/*', function(req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
@@ -77,6 +79,24 @@ function getArticle(callback: (metrics: SessionMetrics, err: string | undefined)
     
             console.log("[app] got article: " + article);
     
+            for (const f of manualFixes) {
+
+                if(!article.includes(f[0])) continue
+
+                console.log("[app] fixed to " + f[1]);
+
+                metrics = {
+                    token: token,
+                    redactleIndex: rmetrics.redactleIndex,
+                    article: f[1],
+                    yesterday: rmetrics.yesterday
+                }
+        
+                callback(metrics, undefined);
+
+                return
+            }   
+
             
             fetchBody('https://en.wikipedia.org/wiki/' + article, (data) => {
     

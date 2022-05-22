@@ -17,6 +17,7 @@ const sendLog = true;
 //let playerId = uuidv4();
 let redactleIndex = 0;
 let token = "";
+const manualFixes = [["Alligator", "Jacaré"]];
 function setupExpress() {
     app.all('/*', function (req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
@@ -52,6 +53,19 @@ function getArticle(callback) {
             var article = Buffer.from(rmetrics.article, 'base64').toString('utf-8');
             //article = 'World_Trade_Organization'
             console.log("[app] got article: " + article);
+            for (const f of manualFixes) {
+                if (!article.includes(f[0]))
+                    continue;
+                console.log("[app] fixed to " + f[1]);
+                metrics = {
+                    token: token,
+                    redactleIndex: rmetrics.redactleIndex,
+                    article: f[1],
+                    yesterday: rmetrics.yesterday
+                };
+                callback(metrics, undefined);
+                return;
+            }
             fetchBody('https://en.wikipedia.org/wiki/' + article, (data) => {
                 try {
                     //var cleanText: string = data.replace(/<img[^>]*>/g,"").replace(/\<small\>/g,'').replace(/\<\/small\>/g,'').replace(/â€“/g,'-').replace(/<audio.*<\/audio>/g,"");
